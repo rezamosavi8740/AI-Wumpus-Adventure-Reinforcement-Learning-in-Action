@@ -22,8 +22,8 @@ class RandomAgent:
             learning rate value
             gamma value
         """
-        self.learning_rate = .01  # learning rate
-        self.gamma = .8
+        self.learning_rate = .1  # learning rate
+        self.gamma = .7
 
         self.epsilon_a = -1 / 1000
         self.epsilon_b = 1
@@ -38,6 +38,14 @@ class RandomAgent:
         self.step = 0
 
         self.cumul_reward = 0
+
+    def setAgent(self, q_table):
+        self.q_table = q_table
+
+    def saveAgent(self):
+        return {
+            "q_table" : self.q_table
+        }
 
     def reset(self):
         self.step = 0

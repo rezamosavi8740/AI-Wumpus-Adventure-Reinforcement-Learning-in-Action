@@ -4,6 +4,8 @@ This is the machinnery that runs your agent in an environment.
 This is not intented to be modified during the practical.
 """
 
+import numpy as np
+
 class Runner:
     def __init__(self, environment, agent, verbose=False):
         self.environment = environment
@@ -11,42 +13,54 @@ class Runner:
         self.verbose = verbose
 
     def step(self):
-        observation = self.environment.observe()
+        observation = self.environment._get_observation()
         action = self.agent.act(observation)
-        (reward, stop) = self.environment.act(action)
+        (ob ,reward, stop) = self.environment.step(action)
         self.agent.reward(observation, action, reward)
-        return (observation, action, reward, stop)
+        return (ob, action, reward, stop)
 
     def loop(self, games, max_iter):
         cumul_reward = 0.0
+        #SEnvironment = self.environment.saveEnvironment()
+        #SAgent = self.agent.saveAgent()
+
         for g in range(1, games+1):
             self.agent.reset()
             self.environment.reset()
-            if g % 6000 == 0:
-                self.environment.generateMaze()
             for i in range(1, max_iter+1):
-                if self.verbose:
-                    print("Simulation step {}:".format(i))
-                    self.environment.display()
+
                 (obs, act, rew, stop) = self.step()
                 cumul_reward += rew
-                if self.verbose:
-                    print(" ->       observation: {}".format(obs))
-                    print(" ->            action: {}".format(act))
-                    print(" ->            reward: {}".format(rew))
-                    print(" -> cumulative reward: {}".format(cumul_reward))
-                    if stop is not None:
-                        print(" ->    Terminal event: {}".format(stop))
+
+                if stop is not None:
+                    print(" ->    Terminal event: {}".format(stop))
                     print()
-                    #if g == games:
-                        #print(self.agent.q_table)
+
                 if stop is not None:
                     break
+                #PYGame
             if self.verbose:
                 print(" <=> Finished game number: {} <=>".format(g))
                 print()
 
-        return cumul_reward
+        return cumul_reward ,self.environment ,self.agent
+
+    def findMap(self):
+        Map =  np.empty((self.environment.gridsize[0], self.environment.gridsize[1]))
+        for x in range(self.environment.gridsize[0]):
+            for y in range(self.environment.gridsize[1]):
+                if (y ,x) in self.environment.wumpus:
+                    Map[(self.environment.gridsize[1] - 1) - x][y] = 2
+                elif (y ,x) in self.environment.holes:
+                    Map[(self.environment.gridsize[1] - 1) - x][y] = 3
+                elif (y ,x) == self.environment.treasure:
+                    Map[(self.environment.gridsize[1] - 1) - x][y] = 1
+                elif (y ,x) == self.environment.agent:
+                    Map[(self.environment.gridsize[1] - 1) - x][y] = 4
+                else:
+                    Map[(self.environment.gridsize[1] - 1) - x][y]= 0
+
+        return Map
 
 def iter_or_loopcall(o, count):
     if callable(o):
@@ -96,3 +110,4 @@ class BatchRunner:
                 print(" ->            average reward: {}".format(avg_reward))
                 print(" -> cumulative average reward: {}".format(cum_avg_reward))
         return cum_avg_reward
+

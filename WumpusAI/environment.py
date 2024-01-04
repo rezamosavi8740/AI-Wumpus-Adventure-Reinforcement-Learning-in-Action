@@ -1,6 +1,9 @@
 from __future__ import division
 from __future__ import print_function
+import pygame
 import numpy as np
+import sys
+
 
 
 """
@@ -41,6 +44,31 @@ class Environment:
         self.init_treasure = rand_pos[-2]
         self.init_agent = rand_pos[-1]
         self.reset()
+
+    def setEnvironment(self, gridsize, num_wumpus, num_holes, charges ,init_holes ,init_wumpus,init_treasure,init_agent):
+        self.gridsize = gridsize
+        self.num_cases = gridsize[0] * gridsize[1]
+        self.num_wumpus = num_wumpus
+        self.num_holes = num_holes
+        self.max_charges = charges
+        self.init_holes = init_holes
+        self.init_wumpus = init_wumpus
+        self.init_treasure = init_treasure
+        self.init_agent = init_agent
+        self.reset()
+
+    def saveEnvironment(self):
+        Environment= {
+            'gridsize' : self.gridsize,
+            'num_wumpus': self.num_wumpus,
+            'num_holes': self.num_holes,
+            'max_charges': self.max_charges,
+            'init_holes': self.init_holes,
+            'init_wumpus': self.init_wumpus,
+            'init_treasure': self.init_treasure,
+            'init_agent': self.init_agent
+        }
+        return Environment
 
     def reset(self):
         """Reset the environment for a new run."""
@@ -168,7 +196,7 @@ class Environment:
         #self.move_wumpus()
         return (-0.10, None)
 
-    def display(self):
+    def display(self ,flag = False):
         print("+-", end='')
         for x in range(self.gridsize[0]):
             print("--", end='')
@@ -178,14 +206,19 @@ class Environment:
             for x in range(self.gridsize[0]):
                 if (x,y) in self.wumpus:
                     print("W ", end='')
+
                 elif (x, y) in self.holes:
                     print("O ", end='')
+
                 elif (x, y) == self.treasure:
                     print("$ ", end='')
+
                 elif (x, y) == self.agent:
                     print("A ", end='')
+
                 else:
                     print(". ", end='')
+
             print("|")
         print("+-", end='')
         for x in range(self.gridsize[0]):
