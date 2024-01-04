@@ -22,8 +22,8 @@ class RandomAgent:
             learning rate value
             gamma value
         """
-        self.learning_rate = .1  # learning rate
-        self.gamma = .7
+        self.learning_rate = .01  # learning rate
+        self.gamma = .8
 
         self.epsilon_a = -1 / 1000
         self.epsilon_b = 1
@@ -44,7 +44,7 @@ class RandomAgent:
 
     def saveAgent(self):
         return {
-            "q_table" : self.q_table
+            "q_table": self.q_table
         }
 
     def reset(self):
@@ -58,32 +58,32 @@ class RandomAgent:
         self.step += 1
         self.epsilon = 0.5
 
-        position, smell, breeze, charges = observation
+        position, is_stink, is_breeze, N_spares = observation
 
         self.create_state(observation)
         state_action = self.q_table[observation]
 
-        #if self.n_episode >= 3000:
-          #  if smell and charges > 0:
-          #      return self.choose_action(state_action)
-         #   else:
-         #       return self.choose_action(state_action[0:4])
+        # if self.n_episode >= 3000:
+        #  if smell and charges > 0:
+        #      return self.choose_action(state_action)
+        #   else:
+        #       return self.choose_action(state_action[0:4])
 
-        if np.random.uniform() >= (self.epsilon_a * self.epsilon + 1)**self.n_episode:
-            if smell and charges > 0:
+        if np.random.uniform() >= (self.epsilon_a * self.epsilon + 1) ** self.n_episode:
+            if is_stink and N_spares > 0:
                 return self.choose_action(state_action)
             else:
                 return self.choose_action(state_action[0:4])
         else:
-            if smell and charges > 0:
-                return np.random.randint(1, 9)
+            if is_stink and N_spares > 0:
+                return np.random.randint(0, 8)
             else:
-                return np.random.randint(1, 5)
+                return np.random.randint(0, 4)
 
     def reward(self, observation, action, reward):
         if self.step > 1:
             self.learn(s=observation,
-                       a=action - 1,
+                       a=action,
                        r=reward,
                        s_=self.next_observation(observation, action),
                        )
@@ -106,27 +106,27 @@ class RandomAgent:
     def choose_action(self, state_action):
         # get the list of actions with maximum value in Q table
         action_with_max_value = [i for i in range(len(state_action)) if state_action[i] == max(state_action)]
-        return np.random.choice(action_with_max_value) + 1
+        return np.random.choice(action_with_max_value)
 
     def next_observation(self, observation, action):
-        position, smell, breeze, charges = observation
-        if action >= 4 and charges > 0:
-            charges -= 1
-            next_observation = (self.next_position(position, action), smell, breeze, charges)
+        position, is_stink, is_breeze, N_spares = observation
+        if action >= 4 and N_spares > 0:
+            N_spares -= 1
+            next_observation = (self.next_position(position, action), is_stink, is_breeze, N_spares)
         else:
-            next_observation = (self.next_position(position, action), smell, breeze, charges)
+            next_observation = (self.next_position(position, action), is_stink, is_breeze, N_spares)
 
         return next_observation
 
     def next_position(self, position, action):
         x, y = position
-        if action == 1 and y <= 2:
+        if action == 0 and y <= 2:
             y += 1
-        elif action == 2 and y >= 0:
+        elif action == 1 and y >= 0:
             y -= 1
-        elif action == 3 and x >= 1:
+        elif action == 2 and x >= 1:
             x -= 1
-        elif action == 4 and x <= 2:
+        elif action == 3 and x <= 2:
             x += 1
         return x, y
 
