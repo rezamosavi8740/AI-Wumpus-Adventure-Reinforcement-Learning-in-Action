@@ -120,12 +120,12 @@ class RandomAgent:
 
     def next_position(self, position, action):
         x, y = position
-        if action == 0 and y <= 2:
-            y += 1
-        elif action == 1 and y >= 0:
-            y -= 1
-        elif action == 2 and x >= 1:
+        if action == 0 and x >= 1:
             x -= 1
+        elif action == 1 and x <= 2:
+            x += 1
+        elif action == 2 and x >= 1:
+            y -= 1
         elif action == 3 and x <= 2:
             x += 1
         return x, y

@@ -62,21 +62,29 @@ class WumpusWorldEnv(gym.Env):
         """
         x, y = self.agent_pos
         if action == 0:
-            if self._is_valid_move((x + 1, y)):
-                self.agent_pos = (x + 1, y)
-                return 0
-        elif action == 1:
             if self._is_valid_move((x - 1, y)):
                 self.agent_pos = (x - 1, y)
                 return 0
+            else:
+                return -2
+        elif action == 1:
+            if self._is_valid_move((x + 1, y)):
+                self.agent_pos = (x + 1, y)
+                return 0
+            else:
+                return -2
         elif action == 2:
             if self._is_valid_move((x, y - 1)):
                 self.agent_pos = (x, y - 1)
                 return 0
+            else:
+                return -2
         elif action == 3:
             if self._is_valid_move((x, y + 1)):
                 self.agent_pos = (x, y + 1)
                 return 0
+            else:
+                return -2
         elif action == 4:
             if self.N_spares > 0:
                 self.N_spares -= 1
@@ -116,26 +124,35 @@ class WumpusWorldEnv(gym.Env):
             self.reset()
 
         output = self._update_agent_position(action)
-        reward, stop = self._calculate_reward(output)
         state = self.get_observation()
+        reward, stop = self._calculate_reward(output ,state)
 
         return state, reward, stop, self.done
 
-    def _calculate_reward(self, output):
+    def _calculate_reward(self, output ,state):
         x, y = self.agent_pos
 
-        if self.agent_pos == self.wumpus_pos or self.agent_pos in self.pit_pos:
+        if self.agent_pos == self.wumpus_pos:
             self.done = True
-            return -2, 'Lose'  # Penalty for falling into pit or encountering Wumpus
+            return -50, 'Losewumpus_po'  # Penalty for falling into pit or encountering Wumpus
+        elif self.agent_pos in self.pit_pos:
+            self.done = True
+            return -20, 'Lose pit_pos'
         elif output == 1:
-            return 0.25, None
+            return 25, None
         elif output == -1:
-            return -0.25, None
+            return -15, None
+        elif output == -2:
+            return  -20, None
         elif self.agent_pos == self.gold_pos:
             self.done = True
-            return 100, 'Win'  # Reward for grabbing gold
+            if state[2]:
+                return 10000, 'Win'  # Reward for grabbing gold
+            else:
+                return 1000, 'Win'  # Reward for grabbing gold
+
         else:
-            return -0.1, None  # Small penalty for each step
+            return -15, None  # Small penalty for each step
 
     def get_observation(self):  # (pos_x, pos_y, breeze, stinks)
         pos_x = self.agent_pos[0]

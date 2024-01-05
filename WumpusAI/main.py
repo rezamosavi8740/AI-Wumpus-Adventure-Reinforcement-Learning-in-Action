@@ -11,8 +11,8 @@ parser = argparse.ArgumentParser(description='RL running machine')
 parser.add_argument('--environment', metavar='ENV_CLASS', type=str, default='WumpusWorldEnv', help='Class to use for the environment. Must be in the \'environment\' module')
 parser.add_argument('--agent', metavar='AGENT_CLASS', default='Agent', type=str,
                     help='Class to use for the agent. Must be in the \'agent\' module.')
-parser.add_argument('--ngames', type=int, metavar='n', default='20000', help='number of games to simulate')
-parser.add_argument('--niter', type=int, metavar='n', default='100', help='max number of iterations per game')
+parser.add_argument('--ngames', type=int, metavar='n', default='30000', help='number of games to simulate')
+parser.add_argument('--niter', type=int, metavar='n', default='25', help='max number of iterations per game')
 parser.add_argument('--batch', type=int, metavar='nagent', default=None,
                     help='batch run several agent at the same time')
 parser.add_argument('--verbose', action='store_true', help='Display cumulative results at each step')
@@ -42,21 +42,23 @@ def main():
     print("Obtained a final reward of {}".format(final_reward))
 
     env.reset()
-    observation = env.get_observation()
-    print(observation)
-    print(ag.q_table)
+
+    #print(observation)
     while True:
         env.render()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
-
+        observation = env.get_observation()
+        print(observation)
         action = ag.act(observation)
         time.sleep(1)
         (ob, reward, stop, done) = env.step(action)
-        observation = ob
+        #observation = ob
         print(reward)
+        print("action : " + str(action))
+        print(ag.q_table)
         if stop:
             print("End game")
             time.sleep(1)

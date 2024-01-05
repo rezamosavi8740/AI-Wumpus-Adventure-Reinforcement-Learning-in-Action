@@ -33,6 +33,7 @@ class Runner:
                 (obs, act, rew, stop) = self.step()
                 cumul_reward += rew
 
+
                 if stop is not None:
                     print(" ->    Terminal event: {}".format(stop))
                     print()
@@ -43,6 +44,7 @@ class Runner:
             if self.verbose:
                 print(" <=> Finished game number: {} <=>".format(g))
                 print()
+
 
         return cumul_reward, self.environment, self.agent
 
