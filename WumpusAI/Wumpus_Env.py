@@ -134,16 +134,16 @@ class WumpusWorldEnv(gym.Env):
 
         if self.agent_pos == self.wumpus_pos:
             self.done = True
-            return -50, 'Losewumpus_po'  # Penalty for falling into pit or encountering Wumpus
+            return -100, 'Lose wumpus_po'  # Penalty for falling into pit or encountering Wumpus
         elif self.agent_pos in self.pit_pos:
             self.done = True
-            return -20, 'Lose pit_pos'
+            return -100, 'Lose pit_pos'
         elif output == 1:
-            return 25, None
+            return 50, None
         elif output == -1:
-            return -15, None
+            return -50, None
         elif output == -2:
-            return  -20, None
+            return  -50, None
         elif self.agent_pos == self.gold_pos:
             self.done = True
             if state[2]:
@@ -152,7 +152,7 @@ class WumpusWorldEnv(gym.Env):
                 return 1000, 'Win'  # Reward for grabbing gold
 
         else:
-            return -15, None  # Small penalty for each step
+            return -20, None  # Small penalty for each step
 
     def get_observation(self):  # (pos_x, pos_y, breeze, stinks)
         pos_x = self.agent_pos[0]

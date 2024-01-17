@@ -25,9 +25,7 @@ class RandomAgent:
         self.learning_rate = .01  # learning rate
         self.gamma = .8
 
-        self.epsilon_a = -1 / 1000
-        self.epsilon_b = 1
-
+        self.epsilon_a = -1 / 2500
         # State-action function (Q-function)
         self.q_table = {}
 
@@ -56,20 +54,20 @@ class RandomAgent:
 
     def act(self, observation):
         self.step += 1
-        self.epsilon = 0.5
+        self.epsilon = 0.11
 
         position, is_stink, is_breeze, N_spares = observation
 
         self.create_state(observation)
         state_action = self.q_table[observation]
 
-        # if self.n_episode >= 3000:
-        #  if smell and charges > 0:
-        #      return self.choose_action(state_action)
-        #   else:
-        #       return self.choose_action(state_action[0:4])
+        if self.n_episode >= 30000:
+            if is_stink and N_spares > 0:
+                return self.choose_action(state_action)
+            else:
+                return self.choose_action(state_action[0:4])
 
-        if np.random.uniform() >= (self.epsilon_a * self.epsilon + 1) ** self.n_episode:
+        elif np.random.uniform() >= (self.epsilon_a * self.epsilon + 1) ** self.n_episode:
             if is_stink and N_spares > 0:
                 return self.choose_action(state_action)
             else:
